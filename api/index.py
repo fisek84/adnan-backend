@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum  # <- ključ, omogućava FastAPI da radi na Vercelu
 
 app = FastAPI()
 
@@ -23,8 +22,5 @@ def get_data():
             {"id": 2, "name": "Sample Item 2", "value": 200},
             {"id": 3, "name": "Sample Item 3", "value": 300},
         ],
-        "total": 3
+        "total": 3,
     }
-
-# VAŽNO — Vercel handler
-handler = Mangum(app)
