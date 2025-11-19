@@ -17,18 +17,17 @@ notion = Client(auth=NOTION_TOKEN)
 
 def get_goals():
     try:
-        return notion.databases.query(**{"database_id": GOALS_DB_ID})
+        return notion.databases.query_database(database_id=GOALS_DB_ID)
     except Exception as e:
         print(f"Error getting goals: {e}")
         return {"error": str(e)}
 
 def get_tasks():
     try:
-        return notion.databases.query(**{"database_id": TASKS_DB_ID})
+        return notion.databases.query_database(database_id=TASKS_DB_ID)
     except Exception as e:
         print(f"Error getting tasks: {e}")
         return {"error": str(e)}
-
 
 def update_goal_status(page_id, new_status):
     try:
