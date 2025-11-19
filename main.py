@@ -1,32 +1,33 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from notion_service import get_goals, get_tasks, update_goal_status, update_task_status
+from notion_client import Client
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+GOALS_DB_ID = os.getenv("GOALS_DB_ID")
+TASKS_DB_ID = os.getenv("TASKS_DB_ID")
+
+notion = Client(auth=NOTION_TOKEN)
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/")
 def root():
     return {"status": "OK", "message": "AdnanAI backend radi."}
 
 @app.get("/goals")
-def list_goals():
-    return get_goals()
+def get_goals():
+    try:
+        result = notion.databases.query(database_id=GOALS_DB_ID)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/tasks")
-def list_tasks():
-    return get_tasks()
-
-@app.post("/goals/{page_id}/{status}")
-def update_goal(page_id: str, status: str):
-    return update_goal_status(page_id, status)
-
-@app.post("/tasks/{page_id}/{status}")
-def update_task(page_id: str, status: str):
-    return update_task_status(page_id, status)
+def get_tasks():
+    try:
+        result = notion.databases.query(database_id=TASKS_DB_ID)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
