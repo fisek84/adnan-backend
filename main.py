@@ -28,6 +28,10 @@ class GoalCreate(BaseModel):
     activity_state: Optional[str] = None
     context_state: Optional[str] = None
 
+class TaskCreate(BaseModel):
+    name: str
+    goal_id: Optional[str] = None  # optional relation to a goal
+
 # ----------------------------
 # HELPER: NAME GENERATOR
 # ----------------------------
@@ -124,6 +128,42 @@ def create_goal(data: GoalCreate):
             "status": "success",
             "goal_id": result["id"],
             "name": generated_name
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+# ----------------------------
+# POST TASKS (NEW)
+# ----------------------------
+
+@app.post("/tasks")
+def create_task(data: TaskCreate):
+    if not data.name:
+        return {"error": "Task name is required"}
+
+    properties = {
+        "Name": {
+            "title": [{"text": {"content": data.name}}]
+        }
+    }
+
+    if data.goal_id:
+        properties["Goal"] = {
+            "relation": [{"id": data.goal_id}]
+        }
+
+    try:
+        result = notion.pages.create(
+            parent={"database_id": TASKS_DB_ID},
+            properties=properties
+        )
+
+        return {
+            "status": "success",
+            "task_id": result["id"],
+            "name": data.name,
+            "goal_id": data.goal_id
         }
 
     except Exception as e:
